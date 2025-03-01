@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EggProductivity</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .egg-container {
+            width: 200px;
+            height: 280px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .task-card {
+            transition: all 0.3s ease;
+        }
+        
+        .task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .egg-animation {
+            width: 100%;
+            height: 100%;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: transform 0.5s ease;
+        }
+        
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+        }
+        
+        .celebration-content {
+            text-align: center;
+            max-width: 600px;
+            padding: 2rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Login/Register Screen -->
+    <div id="auth-screen" class="container mx-auto px-4 py-12">
+        <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Welcome to EggProductivity</h2>
+                <p class="text-gray-600 text-center mb-6">Complete tasks to hatch your productivity eggs!</p>
+                
+                <div class="mb-4">
+                    <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Username</label>
+                    <input type="text" id="username" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter your username">
+                </div>
+                
+                <button id="start-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300">
+                    Get Started
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Screen -->
+    <div id="app-screen" class="hidden container mx-auto px-4 py-8">
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-indigo-600">EggProductivity</h1>
+            <div class="text-gray-700">
+                <span>Welcome, </span>
+                <span id="user-name" class="font-semibold"></span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Left Column: Egg Display -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">Your Egg</h2>
+                <div class="egg-container">
+                    <div id="egg-animation" class="egg-animation"></div>
+                </div>
+                <div class="text-center mt-4">
+                    <p class="text-gray-600">Eggs Hatched: <span id="eggs-count" class="font-bold text-indigo-600">0</span></p>
+                    <p class="text-gray-600">Tasks Completed: <span id="tasks-count" class="font-bold text-indigo-600">0</span></p>
+                </div>
+            </div>
+
+            <!-- Middle Column: Tasks -->
+            <div class="md:col-span-2">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Your Tasks</h2>
+                <div id="tasks-container" class="space-y-4">
+                    <!-- Tasks will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard Section -->
+        <div class="mt-12 bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Leaderboard</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Eggs Hatched</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tasks Completed</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body" class="bg-white divide-y divide-gray-200">
+                        <!-- Leaderboard will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Celebration Modal -->
+    <div id="celebration-modal" class="hidden celebration">
+        <div class="celebration-content">
+            <h2 class="text-3xl font-bold mb-4">Congratulations!</h2>
+            <div class="egg-container mb-6">
+                <div id="hatched-egg-animation" class="egg-animation"></div>
+            </div>
+            <p class="text-xl mb-8">Your egg has hatched!</p>
+            <button id="continue-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline transition duration-300">
+                Continue
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // App State
+        let currentUser = null;
+        let currentTasks = [];
+        
+        // Placeholder for egg animations - replace with actual animation paths
+        const eggAnimations = {
+            intact: "url('/static/images/egg_intact.png')",
+            crack_1: "url('/static/images/egg_crack_1.png')",
+            crack_2: "url('/static/images/egg_crack_2.png')",
+            hatched: "url('/static/images/egg_hatched.png')"
+        };
+        
+        // DOM Elements
+        const authScreen = document.getElementById('auth-screen');
+        const appScreen = document.getElementById('app-screen');
+        const startBtn = document.getElementById('start-btn');
+        const usernameInput = document.getElementById('username');
+        const userNameDisplay = document.getElementById('user-name');
+        const eggsCountDisplay = document.getElementById('eggs-count');
+        const tasksCountDisplay = document.getElementById('tasks-count');
+        const eggAnimation = document.getElementById('egg-animation');
+        const tasksContainer = document.getElementById('tasks-container');
+        const leaderboardBody = document.getElementById('leaderboard-body');
+        const celebrationModal = document.getElementById('celebration-modal');
+        const hatchedEggAnimation = document.getElementById('hatched-egg-animation');
+        const continueBtn = document.getElementById('continue-btn');
+        
+        // API Functions
+        async function createUser(username) {
+            try {
+                const response = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username }),
+                });
+                
+                return await response.json();
+            } catch (error) {
+                console.error('Error creating user:', error);
+                return null;
+            }
+        }
+        
+        async function getUserData(userId) {
+            try {
+                const response = await fetch(`/api/users/${userId}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                return null;
+            }
+        }
+        
+        async function getUserTasks(userId) {
+            try {
+                const response = await fetch(`/api/tasks/${userId}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching tasks:', error);
+                return [];
+            }
+        }
+        
+        async function completeTask(userId, taskId) {
+            try {
+                const response = await fetch(`/api/tasks/${userId}/complete/${taskId}`, {
+                    method: 'POST',
+                });
+                
+                return await response.json();
+            } catch (error) {
+                console.error('Error completing task:', error);
+                return null;
+            }
+        }
+        
+        async function getLeaderboard() {
+            try {
+                const response = await fetch('/api/leaderboard');
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching leaderboard:', error);
+                return [];
+            }
+        }
+        
+        // UI Functions
+        function updateEggAnimation(eggState) {
+            eggAnimation.style.backgroundImage = eggAnimations[eggState];
+        }
+        
+        function renderTasks() {
+            tasksContainer.innerHTML = '';
+            
+            if (currentTasks.length === 0) {
+                tasksContainer.innerHTML = `
+                    <div class="bg-gray-100 p-4 rounded-lg text-center">
+                        <p class="text-gray-600">No tasks available right now. Check back soon!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            currentTasks.forEach(task => {
+                const taskCard = document.createElement('div');
+                taskCard.className = 'task-card bg-white rounded-lg shadow-md p-4 border-l-4 border-indigo-500';
+                taskCard.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="inline-block px-2 py-1 text-xs font-semibold text-indigo-600 bg-indigo-100 rounded-full mb-2">${task.category}</span>
+                            <p class="text-gray-800">${task.description}</p>
+                        </div>
+                        <button class="complete-task-btn ml-4 bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-1 px-3 rounded focus:outline-none focus:shadow-outline transition duration-300" data-task-id="${task.task_id}">
+                            Complete
+                        </button>
+                    </div>
+                `;
+                
+                tasksContainer.appendChild(taskCard);
+                
+                // Add event listener to complete button
+                const completeBtn = taskCard.querySelector('.complete-task-btn');
+                completeBtn.addEventListener('click', async () => {
+                    const result = await completeTask(currentUser.user_id, task.task_id);
+                    if (result && result.success) {
+                        // Update UI
+                        updateEggAnimation(result.egg_state_name);
+                        eggsCountDisplay.textContent = result.completed_eggs;
+                        tasksCountDisplay.textContent = result.completed_tasks;
+                        
+                        // Remove task from list
+                        currentTasks = currentTasks.filter(t => t.task_id !== task.task_id);
+                        renderTasks();
+                        
+                        // If egg hatched, show celebration
+                        if (result.egg_state_name === 'hatched') {
+                            showCelebration();
+                        }
+                        
+                        // If new tasks were generated, refresh task list
+                        if (result.new_tasks_generated) {
+                            refreshTasks();
+                        }
+                        
+                        // Refresh leaderboard
+                        refreshLeaderboard();
+                    }
+                });
+            });
+        }
+        
+        function renderLeaderboard(leaderboardData) {
+            leaderboardBody.innerHTML = '';
+            
+            leaderboardData.forEach((user, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${index + 1}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${user.username}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${user.completed_eggs}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${user.completed_tasks}</div>
+                    </td>
+                `;
+                
+                leaderboardBody.appendChild(row);
+            });
+        }
+        
+        function showCelebration() {
+            hatchedEggAnimation.style.backgroundImage = eggAnimations.hatched;
+            celebrationModal.classList.remove('hidden');
+        }
+        
+        // App Flow Functions
+        async function startApp() {
+            const username = usernameInput.value.trim();
+            
+            if (!username) {
+                alert('Please enter a username');
+                return;
+            }
+            
+            // Create user
+            const user = await createUser(username);
+            
+            if (user) {
+                currentUser = user;
+                
+                // Update UI
+                userNameDisplay.textContent = user.username;
+                eggsCountDisplay.textContent = user.completed_eggs;
+                tasksCountDisplay.textContent = user.completed_tasks;
+                updateEggAnimation(user.egg_state_name);
+                
+                // Switch screens
+                authScreen.classList.add('hidden');
+                appScreen.classList.remove('hidden');
+                
+                // Load tasks and leaderboard
+                refreshTasks();
+                refreshLeaderboard();
+            } else {
+                alert('Failed to create user. Please try again.');
+            }
+        }
+        
+        async function refreshTasks() {
+            const tasks = await getUserTasks(currentUser.user_id);
+            if (Array.isArray(tasks)) {
+                currentTasks = tasks;
+                renderTasks();
+            }
+        }
+        
+        async function refreshLeaderboard() {
+            const leaderboardData = await getLeaderboard();
+            if (Array.isArray(leaderboardData)) {
+                renderLeaderboard(leaderboardData);
+            }
+        }
+        
+        // Event Listeners
+        startBtn.addEventListener('click', startApp);
+        
+        continueBtn.addEventListener('click', () => {
+            celebrationModal.classList.add('hidden');
+        });
+        
+        // Initialize with placeholder animations
+        // This is just temporary - would be replaced with actual image paths
+        updateEggAnimation('intact');
+    </script>
+</body>
+</html>
