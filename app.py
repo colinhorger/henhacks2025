@@ -87,7 +87,7 @@ class User:
 
 # Generate a task using Gemini API
 def generate_task(hobby_category):
-    prompt = f"Generate a single engaging task related to {hobby_category} that can be completed in 15-30 minutes. The task should be specific, actionable, and beginner-friendly. Only return the task description without any additional text. Make sure each item is unique and fun, and feel free to create experimental tasks that encourage exploration and activity."
+    prompt = f"Generate a single engaging task related to {hobby_category} that can be completed in 15-30 minutes. The task should be specific, actionable, and beginner-friendly. Only return the task description without any additional text. DO NOT INCLUDE ANY ADDITIONAL MODIFICATIONS OTHER THAN THE RAW TEXT. DO NOT INCLUDE * OR ** AS THIS MAKES IT DIFFICULT FOR THE USER TO UNDERSTAND. Make sure each item is unique and fun, and feel free to create experimental tasks that encourage exploration and activity."
     
     try:
         # Use the client directly to generate content, matching quick_test.py
