@@ -200,6 +200,29 @@ def complete_task(user_id, task_id):
         return jsonify(response)
     
     return jsonify({"error": "Task not found or already completed"}), 400
+@app.route('/api/tasks/<user_id>/remove/<task_id>', methods=['POST'])
+def remove_task(user_id, task_id):
+    if user_id not in users:
+        return jsonify({"error": "User not found"}), 404
+    
+    user = users[user_id]
+    if user.remove_task(task_id):
+        response = {
+            "success": True,
+            "egg_state": user.current_egg_state,
+            "egg_state_name": EGG_STATES[user.current_egg_state],
+            "completed_eggs": user.completed_eggs,
+            "completed_tasks": user.completed_tasks
+        }
+        
+        # If all tasks are removed, generate new ones
+        if not user.current_tasks:
+            generate_new_tasks_for_user(user_id)
+            response["new_tasks_generated"] = True
+        
+        return jsonify(response)
+    
+    return jsonify({"error": "Task not found or already completed"}), 400
 
 @app.route('/api/leaderboard', methods=['GET'])
 def get_leaderboard():

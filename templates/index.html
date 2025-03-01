@@ -224,6 +224,18 @@
                 return null;
             }
         }
+        async function removeTask(userId, taskId) {
+            try {
+                const response = await fetch(`/api/tasks/${userId}/remove/${taskId}`, {
+                    method: 'POST',
+                });
+                
+                return await response.json();
+            } catch (error) {
+                console.error('Error removing task:', error);
+                return null;
+            }
+        }
         
         async function getLeaderboard() {
             try {
@@ -261,24 +273,25 @@
                             <span class="inline-block px-2 py-1 text-xs font-semibold text-indigo-600 bg-indigo-100 rounded-full mb-2">${task.category}</span>
                             <p class="text-gray-800">${task.description}</p>
                         </div>
-                        <button class="complete-task-btn ml-4 bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-1 px-3 rounded focus:outline-none focus:shadow-outline transition duration-300" data-task-id="${task.task_id}">
+                        <button class="complete-task-btn ml bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-1 px-3 rounded focus:outline-none focus:shadow-outline transition duration-300" data-task-id="${task.task_id}">
                             Complete </button> <br>
-                        <button class="remove-task-btn ml-4 bg-red-500 hover:bg-red-600 text-white text-sm font-medium py-1 px-3 rounded focus:outline-none focus:shadow-outline transition duration-300" data-task-id="${task.task_id}">
+                        <button class="remove-task-btn ml bg-red-500 hover:bg-red-600 text-white text-sm font-medium py-1 px-3 rounded focus:outline-none focus:shadow-outline transition duration-300" data-task-id="${task.task_id}">
                             Remove </button>
                     </div>
                 `;
                 
                 tasksContainer.appendChild(taskCard);
+
+                // Add event listener to complete button
                 const removeBtn = taskCard.querySelector('.remove-task-btn');
                 removeBtn.addEventListener('click', async () =>{
                     const result = await removeTask(currentUser.user_id, task.task_id);
                     if(result && result.success){
                         currentTasks = currentTasks.filter(t => t.task_id !== task.task_id);
                         renderTasks();
+                        refreshLeaderboard();
                     }
                 })
-
-                // Add event listener to complete button
                 const completeBtn = taskCard.querySelector('.complete-task-btn');
                 completeBtn.addEventListener('click', async () => {
                     const result = await completeTask(currentUser.user_id, task.task_id);
