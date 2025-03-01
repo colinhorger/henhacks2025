@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 # Configuration
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
+GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash"
 
 # In-memory data store (replace with a database in production)
 users = {}
