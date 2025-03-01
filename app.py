@@ -4,6 +4,7 @@ import random
 import requests
 from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
+from google import genai  # Import the Google genai package
 
 # Load environment variables from .env file
 load_dotenv()
@@ -12,7 +13,10 @@ app = Flask(__name__)
 
 # Configuration
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash"
+
+# Initialize the Gemini client correctly
+# The 'configure' method doesn't exist, so we create the client directly
+genai_client = genai.Client(api_key=GEMINI_API_KEY)
 
 # In-memory data store (replace with a database in production)
 users = {}
@@ -73,27 +77,13 @@ class User:
 def generate_task(hobby_category):
     prompt = f"Generate a single engaging task related to {hobby_category} that can be completed in 15-30 minutes. The task should be specific, actionable, and beginner-friendly. Only return the task description without any additional text."
     
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {GEMINI_API_KEY}"
-    }
-    
-    payload = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {
-            "temperature": 0.7,
-            "maxOutputTokens": 150,
-        }
-    }
-    
     try:
-        response = requests.post(GEMINI_API_URL, headers=headers, json=payload)
-        response.raise_for_status()
-        result = response.json()
-        
-        # Extract the generated text from Gemini's response
-        generated_text = result["candidates"][0]["content"]["parts"][0]["text"]
-        return generated_text.strip()
+        # Use the client directly to generate content, matching quick_test.py
+        response = genai_client.models.generate_content(
+            model="gemini-2.0-flash", 
+            contents=prompt
+        )
+        return response.text.strip()
     except Exception as e:
         print(f"Error generating task: {e}")
         # Fallback for when API calls fail
