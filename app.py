@@ -5,6 +5,7 @@ import requests
 from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
 from google import genai  # Import the Google genai package
+import time
 
 # Load environment variables from .env file
 load_dotenv()
@@ -64,7 +65,9 @@ class User:
             if self.completed_tasks % 3 == 0:
                 # Egg has hatched
                 self.completed_eggs += 1
-                self.current_egg_state = 0  # Reset to new egg
+                self.current_egg_state = 3
+                #time.sleep(5)
+                #self.current_egg_state = 0  # Reset to new egg
             else:
                 # Update crack level
                 self.current_egg_state = self.completed_tasks % 3
@@ -79,10 +82,12 @@ class User:
             return False
         
 
+    
+
 
 # Generate a task using Gemini API
 def generate_task(hobby_category):
-    prompt = f"Generate a single engaging task related to {hobby_category} that can be completed in 15-30 minutes. The task should be specific, actionable, and beginner-friendly. Only return the task description without any additional text."
+    prompt = f"Generate a single engaging task related to {hobby_category} that can be completed in 15-30 minutes. The task should be specific, actionable, and beginner-friendly. Only return the task description without any additional text. Make sure each item is unique and fun, and feel free to create experimental tasks that encourage exploration and activity."
     
     try:
         # Use the client directly to generate content, matching quick_test.py
