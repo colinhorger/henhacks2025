@@ -80,7 +80,7 @@
     <!-- Main App Screen -->
     <div id="app-screen" class="hidden container mx-auto px-4 py-8">
         <header class="flex justify-between items-center mb-8">
-            <h1 class="text-3xl font-bold text-indigo-600">EggProductivity</h1>
+            <h1 class="text-6xl font-bold text-blue-600">HenHatch</h1>
             <div class="text-gray-700">
                 <span>Welcome, </span>
                 <span id="user-name" class="font-semibold"></span>
@@ -90,7 +90,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Left Column: Egg Display -->
             <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">Your Egg</h2>
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Your Egg</h2>
                 <div class="egg-container">
                     <div id="egg-animation" class="egg-animation"></div>
                 </div>
@@ -269,7 +269,15 @@
                 `;
                 
                 tasksContainer.appendChild(taskCard);
-                
+                const removeBtn = taskCard.querySelector('.remove-task-btn');
+                removeBtn.addEventListener('click', async () =>{
+                    const result = await removeTask(currentUser.user_id, task.task_id);
+                    if(result && result.success){
+                        currentTasks = currentTasks.filter(t => t.task_id !== task.task_id);
+                        renderTasks();
+                    }
+                })
+
                 // Add event listener to complete button
                 const completeBtn = taskCard.querySelector('.complete-task-btn');
                 completeBtn.addEventListener('click', async () => {

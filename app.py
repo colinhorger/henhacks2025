@@ -71,6 +71,13 @@ class User:
             
             return True
         return False
+    def remove_task(self, task_id):
+        if task_id in self.current_tasks:
+            self.current_tasks.remove(task_id)
+            return True
+        else:
+            return False
+        
 
 
 # Generate a task using Gemini API
