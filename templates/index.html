@@ -69,7 +69,10 @@
                     <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Username</label>
                     <input type="text" id="username" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter your username">
                 </div>
-                
+                <div class="mt-4 mb-4">
+                    <label for="hobbies" class="block text-gray-700 text-sm font-bold mb-2">Hobbies</label>
+                    <input type="text" id="user-hobbies" class = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter your hobbies ('reading, knitting, etc;')">
+                </div>
                 <button id="start-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300">
                     Get Started
                 </button>
@@ -173,6 +176,7 @@
         const appScreen = document.getElementById('app-screen');
         const startBtn = document.getElementById('start-btn');
         const usernameInput = document.getElementById('username');
+        const hobbiesInput = document.getElementById('user-hobbies')
         const userNameDisplay = document.getElementById('user-name');
         const eggsCountDisplay = document.getElementById('eggs-count');
         const tasksCountDisplay = document.getElementById('tasks-count');
@@ -184,14 +188,14 @@
         const continueBtn = document.getElementById('continue-btn');
         
         // API Functions
-        async function createUser(username) {
+        async function createUser(username, hobbies) {
             try {
                 const response = await fetch('/api/users', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ username }),
+                    body: JSON.stringify({ username, hobbies }),
                 });
                 
                 return await response.json();
@@ -365,22 +369,31 @@
         // App Flow Functions
         async function startApp() {
             const username = usernameInput.value.trim();
+            hobbies = hobbiesInput.value.trim();
             
             if (!username) {
                 alert('Please enter a username');
                 return;
             }
+            if(!hobbies) {
+                alert('Please enter hobbies');
+                return;
+            }
             
+            hobbies = hobbies.split(',').map(hobby => hobby.trim()).filter(hobby => hobby !== "");
+
             // Create user
-            const user = await createUser(username);
+            const user = await createUser(username, hobbies);
             
             if (user) {
                 currentUser = user;
+                currentHobbies = hobbies;
                 
                 // Update UI
                 userNameDisplay.textContent = user.username;
                 eggsCountDisplay.textContent = user.completed_eggs;
                 tasksCountDisplay.textContent = user.completed_tasks;
+                user.hobbies = currentHobbies
                 updateEggAnimation(user.egg_state_name);
                 
                 // Switch screens
@@ -388,6 +401,7 @@
                 appScreen.classList.remove('hidden');
                 
                 // Load tasks and leaderboard
+                
                 refreshTasks();
                 refreshLeaderboard();
             } else {

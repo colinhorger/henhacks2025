@@ -44,6 +44,7 @@ class User:
         self.current_tasks = []
         self.current_egg_state = 0
         self.completed_tasks = 0
+        self.hobbies = []
 
     def to_dict(self):
         return {
@@ -74,6 +75,7 @@ class User:
             
             return True
         return False
+    
     def remove_task(self, task_id):
         if task_id in self.current_tasks:
             self.current_tasks.remove(task_id)
@@ -120,6 +122,7 @@ def create_user():
     data = request.json
     user_id = str(len(users) + 1)  # Simple ID generation
     new_user = User(user_id, data['username'])
+    new_user.hobbies = data['hobbies']
     users[user_id] = new_user
     
     # Generate initial tasks
@@ -159,9 +162,12 @@ def generate_new_tasks_for_user(user_id):
     
     # Clear current tasks if any
     user.current_tasks = []
-    
+    hobbyies = user.hobbies
     # Generate 3 new tasks from different categories
-    selected_categories = random.sample(hobby_categories, 3)
+    if len(user.hobbies) > 3 :
+        selected_categories = random.sample(hobbyies, 3)
+    else:
+        selected_categories = user.hobbies
     
     for category in selected_categories:
         task_description = generate_task(category)
