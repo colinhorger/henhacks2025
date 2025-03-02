@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EggProductivity</title>
+    <title>HenHatch</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
         .egg-container {
@@ -12,7 +12,10 @@
             margin: 0 auto;
             position: relative;
         }
-        
+        .body{
+            background-image: url("/static/images/med.png");
+            background-repeat: no-repeat;
+        }
         .task-card {
             transition: all 0.3s ease;
         }
@@ -57,7 +60,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="body">
     <!-- Login/Register Screen -->
     <div id="auth-screen" class="container mx-auto px-4 py-12">
         <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
