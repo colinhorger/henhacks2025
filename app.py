@@ -32,8 +32,15 @@ EGG_STATES = {
     0: "intact",    # New egg
     1: "crack_1",   # One task completed
     2: "crack_2",   # Two tasks completed
-    3: "hatched"    # All tasks completed
+    3: "hatched",   # First hatched style
+    4: "hatched2",  # Second hatched style
+    5: "hatched3",  # Third hatched style
+    6: "hatched4",  # Fourth hatched style
+    7: "hatched5"   # Fifth hatched style
 }
+
+# Hatched state IDs for random selection
+HATCHED_STATES = [3, 4, 5, 6, 7]
 
 # User model
 class User:
@@ -63,27 +70,25 @@ class User:
             
             # Update egg state
             if self.completed_tasks % 3 == 0:
-                # Egg has hatched
+                # Egg has hatched - randomly select one of the hatched states
                 self.completed_eggs += 1
-                self.current_egg_state = 3
-                #time.sleep(5)
-                #self.current_egg_state = 0  # Reset to new egg
+                self.current_egg_state = random.choice(HATCHED_STATES)
+                # Note: Reset functionality commented out as in the original
+                # time.sleep(5)
+                # self.current_egg_state = 0  # Reset to new egg
             else:
                 # Update crack level
                 self.current_egg_state = self.completed_tasks % 3
             
             return True
         return False
+    
     def remove_task(self, task_id):
         if task_id in self.current_tasks:
             self.current_tasks.remove(task_id)
             return True
         else:
             return False
-        
-
-    
-
 
 # Generate a task using Gemini API
 def generate_task(hobby_category):
@@ -200,6 +205,7 @@ def complete_task(user_id, task_id):
         return jsonify(response)
     
     return jsonify({"error": "Task not found or already completed"}), 400
+
 @app.route('/api/tasks/<user_id>/remove/<task_id>', methods=['POST'])
 def remove_task(user_id, task_id):
     if user_id not in users:
