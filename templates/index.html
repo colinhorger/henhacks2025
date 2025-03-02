@@ -112,8 +112,8 @@
                 </div>
                 <!--<div class = "flex justify-between items-start mt-4">
                 <button id = "generate-task" class = "w-1/4 bg-indigo-600 font-semibold hover:bg-indigo-700 text-white py-2 px-8 rounded-lg focus:outline-none focus:shadow-outline">Generate a Task</button>
-                <input type="text" id="generate_task_category" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 text-sm focus:outline-none focus:shadow-outline" placeholder="Enter your category">-->
-                </div>
+                <input type="text" id="generate_task_category" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 text-sm focus:outline-none focus:shadow-outline" placeholder="Enter your category">
+                </div>-->
             </div>
         </div>
 
@@ -305,6 +305,9 @@
                         renderTasks();
                         refreshLeaderboard();
                     }
+                    if (result.new_tasks_generated) {
+                            refreshTasks();
+                        }
                 })
                 const completeBtn = taskCard.querySelector('.complete-task-btn');
                 completeBtn.addEventListener('click', async () => {
