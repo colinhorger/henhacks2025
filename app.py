@@ -4,7 +4,7 @@ import random
 import requests
 from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
-from google import genai  # Import the Google genai package
+from google import genai
 import time
 
 # Load environment variables from .env file
