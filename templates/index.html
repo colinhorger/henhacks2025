@@ -320,9 +320,9 @@
                         currentTasks = currentTasks.filter(t => t.task_id !== task.task_id);
                         renderTasks();
                         
-                        // If egg hatched, show celebration
-                        if (result.egg_state_name === 'hatched') {
-                            showCelebration();
+                        // If egg hatched, show celebration with the egg state name
+                        if (result.egg_state_name.startsWith('hatched')) {
+                            showCelebration(result.egg_state_name);
                         }
                         
                         // If new tasks were generated, refresh task list
@@ -361,10 +361,12 @@
             });
         }
         
-        function showCelebration() {
-            hatchedEggAnimation.style.backgroundImage = eggAnimations.hatched;
+
+        function showCelebration(eggStateName) {
+            // Set the hatched egg animation to match the egg state returned from the API
+            hatchedEggAnimation.style.backgroundImage = eggAnimations[eggStateName];
             celebrationModal.classList.remove('hidden');
-        }
+            }
         
         // App Flow Functions
         async function startApp() {
