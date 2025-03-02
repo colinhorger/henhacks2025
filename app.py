@@ -36,11 +36,13 @@ EGG_STATES = {
     4: "hatched2",  # Second hatched style
     5: "hatched3",  # Third hatched style
     6: "hatched4",  # Fourth hatched style
-    7: "hatched5"   # Fifth hatched style
+    #7: "hatched5"   # Fifth hatched style
 }
 
 # Hatched state IDs for random selection
-HATCHED_STATES = [3, 4, 5, 6, 7]
+HATCHED_STATES = [3, 4, 5, 6, 
+                  #7
+                  ]
 
 # User model
 class User:
